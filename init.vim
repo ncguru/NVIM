@@ -36,17 +36,34 @@ nnoremap <expr><C--> ChangeScaleFactor(1/1.25)
 
 endif
 
+" 'gelguy/wilder.nvim',
+function! UpdateRemotePlugins(...)
+	" Needed to refresh runtime files
+	let &rtp=&rtp
+	UpdateRemotePlugins
+endfunction
+
+
 
 
 call plug#begin('~/AppData/Local/nvim/plugged')
+" A more adventurous wildmenu Cammand Line
+"Plug 'sharkdp/fd'
+"Plug 'nixprime/cpsm'
+Plug 'gelguy/wilder.nvim', { 'do': function('UpdateRemotePlugins') }
+
+
 "indent guide line
 Plug 'Yggdroot/indentLine'
 
 "Cscope
 Plug 'mfulz/cscope.nvim'
 
-"Session
-Plug 'mhinz/vim-startify'
+"Session, Start up
+"Plug 'mhinz/vim-startify'
+Plug 'lambdalisue/nerdfont.vim'
+"Plug 'csch0/vim-startify-renderer-nerdfont'
+Plug 'nvimdev/dashboard-nvim', {'event':'VimEnter'}
 
 " airline is a better status line and a tab-bar for nvim.
 Plug 'vim-airline/vim-airline'
@@ -75,6 +92,8 @@ Plug 'pepo-le/win-ime-con.nvim'
 
 " devicons
 Plug 'nvim-tree/nvim-web-devicons'
+
+Plug 'ryanoasis/vim-devicons'
 
 " File Explore
 Plug 'nvim-tree/nvim-tree.lua'
@@ -111,6 +130,39 @@ Plug 'heavenshell/vim-pydocstring'
 
 call plug#end()
 
+
+" 'gelguy/wilder.nvim',
+call wilder#setup({'modes': [':', '/', '?']})
+
+call wilder#set_option('pipeline', [
+      \   wilder#branch(
+      \     wilder#cmdline_pipeline(),
+      \     wilder#search_pipeline(),
+      \   ),
+      \ ])
+
+
+call wilder#set_option('renderer', wilder#popupmenu_renderer({
+      \ 'highlighter': wilder#basic_highlighter(),
+      \ 'left': [
+      \   ' ', wilder#popupmenu_devicons(),
+      \ ],
+      \ 'right': [
+      \   ' ', wilder#popupmenu_scrollbar(),
+      \ ],
+      \ }))
+
+
+" 'border'            : 'single', 'double', 'rounded' or 'solid'
+"                     : can also be a list of 8 characters,
+"                     : see :h wilder#popupmenu_border_theme() for more details
+" 'highlights.border' : highlight to use for the border`
+call wilder#set_option('renderer', wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
+      \ 'highlights': {
+      \   'border': 'Normal',
+      \ },
+      \ 'border': 'rounded',
+      \ })))
 
 
 if has('autocmd')
@@ -281,6 +333,7 @@ let mapleader="\<SPACE>"
   set list lcs=tab:\|\ 
 
   :command Ex NvimTreeFindFile
+  :command EX NvimTreeFindFileToggle
 
 " }
 
@@ -513,6 +566,39 @@ vim.opt.termguicolors = true
 
 -- empty setup using defaults
 require("nvim-tree").setup()
+
+-- empty setup using defaults
+require('dashboard').setup({
+    theme = 'hyper',
+    config = {
+      week_header = {
+       enable = true,
+      },
+      shortcut = {
+        { desc = '󰊳 Update', group = '@property', action = 'Lazy update', key = 'u' },
+        {
+          icon = ' ',
+          icon_hl = '@variable',
+          desc = 'Files',
+          group = 'Label',
+          action = 'Telescope find_files',
+          key = 'f',
+        },
+        {
+          desc = ' Apps',
+          group = 'DiagnosticHint',
+          action = 'Telescope app',
+          key = 'a',
+        },
+        {
+          desc = ' dotfiles',
+          group = 'Number',
+          action = 'Telescope dotfiles',
+          key = 'd',
+        },
+      },
+    },
+  })
 
 
 ----LSP-----------------------------------------------

@@ -14,7 +14,7 @@ set guifontwide=PlemolJP_Console_NF:h12
 source $VIMRUNTIME/mswin.vim 
 
 " Python configurations
-let g:python3_host_prog = '%USERPROFILE%\AppData\Local\Programs\Python\Python310\python'
+"let g:python3_host_prog = '%USERPROFILE%\AppData\Local\Programs\Python\Python310\python'
 
 "========= neovide==================================================================
 if exists("g:neovide")
@@ -127,7 +127,7 @@ if has('path_extra')
 	setglobal tags-=./tags tags^=./tags;
 endif
 
-"set autochdir           " Switch to current file's parent directory.
+set autochdir           " Switch to current file's parent directory.
 
 " Remove special characters for filename
 set isfname-=:
@@ -206,6 +206,8 @@ set mouse=a
 "Indentline For Tab
 set list lcs=tab:\|\ 
 
+
+
 " 'gelguy/wilder.nvim',
 function! UpdateRemotePlugins(...)
 	" Needed to refresh runtime files
@@ -215,6 +217,10 @@ endfunction
 
 "==== PlugIn manager==========================================
 call plug#begin('~/AppData/Local/nvim/plugged')
+" AI gemini
+"Plug 'kiddos/gemini.nvim'
+
+
 " A more adventurous wildmenu Cammand Line
 "Plug 'sharkdp/fd'
 "Plug 'nixprime/cpsm'
@@ -224,15 +230,15 @@ Plug 'gelguy/wilder.nvim', { 'do': function('UpdateRemotePlugins') }
 Plug 'Yggdroot/indentLine'
 
 "Cscope
-Plug 'mfulz/cscope.nvim'
+"Plug 'mfulz/cscope.nvim'
 
 "nerd font
 Plug 'lambdalisue/nerdfont.vim'
 
 "Session, Start up
-"Plug 'mhinz/vim-startify'
-"Plug 'csch0/vim-startify-renderer-nerdfont'
-Plug 'nvimdev/dashboard-nvim', {'event':'VimEnter'}
+Plug 'mhinz/vim-startify'
+Plug 'csch0/vim-startify-renderer-nerdfont'
+"Plug 'nvimdev/dashboard-nvim', {'event':'VimEnter'}
 
 " airline is a better status line and a tab-bar for nvim.
 Plug 'vim-airline/vim-airline'
@@ -249,7 +255,8 @@ Plug 'junegunn/fzf.vim'
 
 " Telescope
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.5' }
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.6' }
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 " LSP
 Plug 'prabirshrestha/vim-lsp'
@@ -544,98 +551,109 @@ augroup END" -------------------- LSP ---------------------------------
 lua <<EOF
 
 ----NvimTree-----------------------------------------------
- vim.g.loaded_netrw = 1
+ vim.g.loaded_netrw = 1 -- netrw Disable
  vim.g.loaded_netrwPlugin = 1
 
 -- optionally enable 24-bit colour
 vim.opt.termguicolors = true
 
 -- empty setup using defaults
-require("nvim-tree").setup()
+-- export DISABLE_GEMINI_INLINE=1
 
+--require('gemini').setup({
+--  menu_key = '<S-o>',
+--  insert_result_key = '<S-Tab>',
+--  hints_delay = 3000,
+--  instruction_delay = 2000,
+--  menu_prompts = {
+--    {
+--      name = 'Unit Test Generation',
+--      command_name = 'GeminiUnitTest',
+--      menu = 'Unit Test 🚀',
+--      prompt = 'Write unit tests for the following code\n',
+--    },
+--    {
+--      name = 'Code Review',
+--      command_name = 'GeminiCodeReview',
+--      menu = 'Code Review 📜',
+--      prompt = 'Do a thorough code review for the following code.\nProvide detail explaination and sincere comments.\n',
+--    },
+--    {
+--      name = 'Code Explain',
+--      command_name = 'GeminiCodeExplain',
+--      menu = 'Code Explain 👻',
+--      prompt = 'Explain the following code\nprovide the answer in Markdown\n',
+--    },
+--  },
+--  hints_prompt = [[
+--Instruction: Use 1 or 2 sentences to describe what the following {filetype} function does:
+--
+--\`\`\`{filetype}
+--{code_block}
+--\`\`\`
+--  ]],
+--  instruction_prompt = [[
+--Context: filename: \`{filename}\`
+--
+--Instruction: ***{instruction}***
+--
+--  ]],
+--}) 
+--
 -- empty setup using defaults
-require('dashboard').setup({
-    theme = 'hyper',
-    config = {
-      week_header = {
-       enable = true,
-      },
-      shortcut = {
-        { desc = '󰊳 Update', group = '@property', action = 'Lazy update', key = 'u' },
-        {
-          icon = ' ',
-          icon_hl = '@variable',
-          desc = 'Files',
-          group = 'Label',
-          action = 'Telescope find_files',
-          key = 'f',
-        },
-        {
-          desc = ' Apps',
-          group = 'DiagnosticHint',
-          action = 'Telescope app',
-          key = 'a',
-        },
-        {
-          desc = ' dotfiles',
-          group = 'Number',
-          action = 'Telescope dotfiles',
-          key = 'd',
-        },
-      },
-    },
-  })
+require("nvim-tree").setup()
 
 
 ----LSP-----------------------------------------------
 require'toggle_lsp_diagnostics'.init()
 
 ----nvim-treesitter-----------------------------------------------
-require'nvim-treesitter.install'.compilers = { "gcc" }
-require'nvim-treesitter.configs'.setup {
-      -- A list of parser names, or "all" (the five listed parsers should always be installed)
-      --ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "javascript", "python", "ini"   },
-    
-      -- Install parsers synchronously (only applied to `ensure_installed`)
-      sync_install = false,
-    
-      -- Automatically install missing parsers when entering buffer
-      -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-      auto_install = false,
-      -- Enable Rainbow Parentheses
-      rainbow = { enable = false},
-      -- Enable Treesitter Playground
-      playground = { enable = false},
-      -- List of parsers to ignore installing (or "all")
-      ignore_install = { },
-    
-      ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
-      -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
-    
-      highlight = {
-        enable = false,
-    
-        -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
-        -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
-        -- the name of the parser)
-        -- list of language that will be disabled
-        disable = { },
-        -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-        disable = function(lang, buf)
-            local max_filesize = 100 * 1024 -- 100 KB
-            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-            if ok and stats and stats.size > max_filesize then
-                return true
-            end
-        end,
-    
-        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-        -- Using this option may slow down your editor, and you may see some duplicate highlights.
-        -- Instead of true it can also be a list of languages
-        additional_vim_regex_highlighting = false,
-      },
-    }
+--require'nvim-treesitter.install'.compilers = { "gcc" }
+--require'nvim-treesitter.configs'.setup {
+--      -- A list of parser names, or "all" (the five listed parsers should always be installed)
+--      --ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "javascript", "python", "ini"   },
+--    
+--      -- Install parsers synchronously (only applied to `ensure_installed`)
+--      sync_install = false,
+--    
+--      -- Automatically install missing parsers when entering buffer
+--      -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+--      auto_install = false,
+--      -- Enable Rainbow Parentheses
+--      rainbow = { enable = false},
+--      -- Enable Treesitter Playground
+--      playground = { enable = false},
+--      -- List of parsers to ignore installing (or "all")
+--      ignore_install = { },
+--    
+--      ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+--      -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+--    
+--      highlight = {
+--        enable = false,
+--    
+--        -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+--        -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+--        -- the name of the parser)
+--        -- list of language that will be disabled
+--        disable = { },
+--        -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+--        disable = function(lang, buf)
+--            local max_filesize = 100 * 1024 -- 100 KB
+--            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+--            if ok and stats and stats.size > max_filesize then
+--                return true
+--            end
+--        end,
+--    
+--        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+--        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+--        -- Using this option may slow down your editor, and you may see some duplicate highlights.
+--        -- Instead of true it can also be a list of languages
+--        additional_vim_regex_highlighting = false,
+--      },
+--    }
+--
 
 EOF
 
@@ -658,14 +676,14 @@ nnoremap <leader>fd <cmd>Telescope lsp_definitions<cr>
 
 
 "======================CSCOPE Auto load====================================================
-au  BufRead *
-	\if has("cscope")
-		\add any database in current dir
-		\if filereadable("cscope.out")
-			\cs add cscope.out
-		\endif
-	\endif
-"
+"au  BufRead *
+"	\if has("cscope")
+"		\add any database in current dir
+"		\if filereadable("cscope.out")
+"			\cs add cscope.out
+"		\endif
+"	\endif
+""
 "
 "=======Plug airblade/vim-roooter'================================
 let g:rooter_patterns = ['.repo', 'cscope.out', '.thisRoot', '.gitignore']

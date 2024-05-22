@@ -1,3 +1,8 @@
+if exists('g:vscode')
+    " VSCode extension
+else
+    " ordinary Neovim
+
 set enc=utf-8
 set fenc=utf-8
 set fencs=sjis,cp949,utf-8,ucs-bom,latin1,sjis
@@ -10,8 +15,6 @@ set langmenu=en_US.UTF-8
 set guifont=Fira\ Code\ Nerd\ Font:h12
 set guifontwide=PlemolJP_Console_NF:h12
 "set guifont=PlemolJP_Console_NF:h12
-
-source $VIMRUNTIME/mswin.vim 
 
 " Python configurations
 "let g:python3_host_prog = '%USERPROFILE%\AppData\Local\Programs\Python\Python310\python'
@@ -114,11 +117,15 @@ if &listchars ==# 'eol:$'
 	set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif
 
-set list                " Show problematic characters.
+"set list                " Show problematic characters.
+"Indentline For Tab
+"set list lcs=tab:\|\ 
+
+
 
 " Also highlight all tabs and trailing whitespace characters.
-highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-match ExtraWhitespace /\s\+$\|\t/
+"highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+"match ExtraWhitespace /\s\+$\|\t/
 
 " }
 
@@ -153,10 +160,10 @@ set wildmenu
 set wildmode=list:longest
 set wildchar=<TAB>
 
-set viminfo='100,<50,s10,h,rA:,rB:
-if !empty(&viminfo)
-	set viminfo^=!        " Write a viminfo file with registers.
-endif
+"set viminfo='100,<50,s10,h,rA:,rB:
+"if !empty(&viminfo)
+"	set viminfo^=!        " Write a viminfo file with registers.
+"endif
 set sessionoptions-=options
 
 set nobackup            " no backup files
@@ -203,8 +210,6 @@ nnoremap k gk
 " Enable mouse support (move cursor with mouse)
 set mouse=a
 
-"Indentline For Tab
-set list lcs=tab:\|\ 
 
 
 
@@ -217,20 +222,21 @@ endfunction
 
 "==== PlugIn manager==========================================
 call plug#begin('~/AppData/Local/nvim/plugged')
+" Typing Game
+Plug 'nagy135/typebreak.nvim'
+
 " AI gemini
 "Plug 'kiddos/gemini.nvim'
 
-
-" A more adventurous wildmenu Cammand Line
 "Plug 'sharkdp/fd'
 "Plug 'nixprime/cpsm'
+
+" A more adventurous wildmenu Cammand Line
 Plug 'gelguy/wilder.nvim', { 'do': function('UpdateRemotePlugins') }
 
 "indent guide line
-Plug 'Yggdroot/indentLine'
-
-"Cscope
-"Plug 'mfulz/cscope.nvim'
+Plug 'lukas-reineke/indent-blankline.nvim'
+Plug 'echasnovski/mini.nvim', { 'branch': 'stable' }
 
 "nerd font
 Plug 'lambdalisue/nerdfont.vim'
@@ -243,8 +249,11 @@ Plug 'csch0/vim-startify-renderer-nerdfont'
 " airline is a better status line and a tab-bar for nvim.
 Plug 'vim-airline/vim-airline'
 "Plug 'vim-airline/vim-airline-themes'
+
 " gruvbox colorscheme. Seems to work the best for me.
-Plug 'rafamadriz/gruvbox'
+" Plug 'rafamadriz/gruvbox'
+Plug 'ellisonleao/gruvbox.nvim'
+Plug 'folke/tokyonight.nvim'
 
 "taglist
 Plug 'yegappan/taglist'
@@ -255,15 +264,30 @@ Plug 'junegunn/fzf.vim'
 
 " Telescope
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.6' }
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.7' }
 Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
+Plug 'neovim/nvim-lspconfig'
 
-" LSP
-Plug 'prabirshrestha/vim-lsp'
-Plug 'mattn/vim-lsp-settings'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
+"Plug 'prabirshrestha/vim-lsp'
+"Plug 'mattn/vim-lsp-settings'
+"Plug 'prabirshrestha/asyncomplete.vim'
+"Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'WhoIsSethDaniel/toggle-lsp-diagnostics.nvim' "Toggle ALL diagnostics on/off
+
+" ==== Auto Complete
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+
+" For vsnip users.
+Plug 'hrsh7th/cmp-vsnip'
+Plug 'hrsh7th/vim-vsnip'
+
 
 "==== IME 입력 모드에서 명령모드 변경시 IME 영문으로 자동 변경============
 Plug 'pepo-le/win-ime-con.nvim'
@@ -280,13 +304,17 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 
 " C and C++ syntax
-Plug 'bfrg/vim-cpp-modern'
+"Plug 'bfrg/vim-cpp-modern'
 
 " 20220305 - javascript syntax highlight
-Plug 'jelera/vim-javascript-syntax'
+"Plug 'jelera/vim-javascript-syntax'
+
+" syntax python
+"Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
 
 " syntax Color"
-Plug 'frazrepo/vim-rainbow'
+"Plug 'frazrepo/vim-rainbow'
+Plug 'HiPhish/nvim-ts-rainbow2'  " Treesitter Rainbow 
 
 " Git 
 Plug 'tpope/vim-fugitive'
@@ -295,7 +323,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-rooter'
 
 "oldfiles
-Plug 'gpanders/vim-oldfiles'
+"Plug 'gpanders/vim-oldfiles'
 
 " Functionalities - Python
 Plug 'psf/black', { 'branch': 'stable' }
@@ -308,14 +336,9 @@ call plug#end()
 
 
 " 'gelguy/wilder.nvim',
-call wilder#setup({'modes': [':', '/', '?']})
+"call wilder#setup({'modes': [':', '/', '?']})
+call wilder#setup({'modes': [':', '?']})
 
-call wilder#set_option('pipeline', [
-			\   wilder#branch(
-			\     wilder#cmdline_pipeline(),
-			\     wilder#search_pipeline(),
-			\   ),
-			\ ])
 
 " 'border'            : 'single', 'double', 'rounded' or 'solid'
 "                     : can also be a list of 8 characters,
@@ -335,8 +358,12 @@ call wilder#set_option('renderer', wilder#popupmenu_renderer(wilder#popupmenu_bo
 			\ ],
 			\ })))
 
-
-"
+call wilder#set_option('pipeline', [
+			\   wilder#branch(
+			\     wilder#cmdline_pipeline(),
+			\     wilder#search_pipeline(),
+			\   ),
+			\ ])
 
 
 :command Ex NvimTreeFindFile
@@ -459,12 +486,11 @@ let g:indentLine_enabled = 1
 " vim:set ft=vim sw=2 ts=2:
 
 "======LSP===================================================================
-let g:lsp_settings_root_markers = [
-\   '.repo',
-\   'cscope.out',
-\   '.thisRoot',
-\   '.gitignore',
-\ ]
+"let g:lsp_settings_root_markers = [
+"\   '.repo',
+"\   '.gitignore',
+"\   '.thisRoot',
+"\ ]
 
 "let g:lsp_settings_root_markers = [
 "\   'cscope.out',
@@ -479,7 +505,7 @@ let g:lsp_settings_root_markers = [
 "
 
 
-let g:lsp_diagnostics_enabled = 0
+"let g:lsp_diagnostics_enabled = 0
 
 
 
@@ -548,6 +574,7 @@ augroup lsp_install
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END" -------------------- LSP ---------------------------------
 
+
 lua <<EOF
 
 ----NvimTree-----------------------------------------------
@@ -605,60 +632,166 @@ require("nvim-tree").setup()
 
 
 ----LSP-----------------------------------------------
-require'toggle_lsp_diagnostics'.init()
+require("mason").setup()
+require("mason-lspconfig").setup()
+require'toggle_lsp_diagnostics'.init({start_on = false})
 
+-- Set up lspconfig.
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+require('lspconfig')['pylsp'].setup {
+	capabilities = capabilities
+}
+require('lspconfig')['clangd'].setup {
+	capabilities = capabilities
+}
+require('lspconfig')['denols' ].setup {
+	capabilities = capabilities
+}
 ----nvim-treesitter-----------------------------------------------
---require'nvim-treesitter.install'.compilers = { "gcc" }
---require'nvim-treesitter.configs'.setup {
---      -- A list of parser names, or "all" (the five listed parsers should always be installed)
---      --ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "javascript", "python", "ini"   },
---    
---      -- Install parsers synchronously (only applied to `ensure_installed`)
---      sync_install = false,
---    
---      -- Automatically install missing parsers when entering buffer
---      -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
---      auto_install = false,
---      -- Enable Rainbow Parentheses
---      rainbow = { enable = false},
---      -- Enable Treesitter Playground
---      playground = { enable = false},
---      -- List of parsers to ignore installing (or "all")
---      ignore_install = { },
---    
---      ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
---      -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
---    
---      highlight = {
---        enable = false,
---    
---        -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
---        -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
---        -- the name of the parser)
---        -- list of language that will be disabled
---        disable = { },
---        -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
---        disable = function(lang, buf)
---            local max_filesize = 100 * 1024 -- 100 KB
---            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
---            if ok and stats and stats.size > max_filesize then
---                return true
---            end
---        end,
---    
---        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
---        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
---        -- Using this option may slow down your editor, and you may see some duplicate highlights.
---        -- Instead of true it can also be a list of languages
---        additional_vim_regex_highlighting = false,
---      },
---    }
---
+require'nvim-treesitter.install'.compilers = { "gcc" }
+require'nvim-treesitter.configs'.setup {
+	-- A list of parser names, or "all" (the five listed parsers should always be installed)
+	ensure_installed = {"c", "lua", "vim", "vimdoc", "query", "javascript", "python", "ini"   },
 
+	-- Install parsers synchronously (only applied to `ensure_installed`)
+	sync_install = false,
+
+	-- Automatically install missing parsers when entering buffer
+	-- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+	auto_install = false,
+	-- Enable Rainbow Parentheses
+	rainbow = {
+		enable = true,
+	}, 
+	-- Enable Treesitter Playground
+	playground = { enable = false},
+	-- List of parsers to ignore installing (or "all")
+	ignore_install = { },
+
+	---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+	-- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+
+	highlight = {
+		enable = true,
+
+		-- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+		-- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+		-- the name of the parser)
+		-- list of language that will be disabled
+		disable = { },
+		-- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+		disable = function(lang, buf)
+		local max_filesize = 100 * 1024 -- 100 KB
+		local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+		if ok and stats and stats.size > max_filesize then
+			return true
+			end
+			end,
+
+			-- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+			-- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+			-- Using this option may slow down your editor, and you may see some duplicate highlights.
+			-- Instead of true it can also be a list of languages
+			additional_vim_regex_highlighting = false,
+	},
+}
+  
+-- ===== nvim-cmp ==========================================
+
+-- Set up nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+  	snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+        -- vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+      end,
+    },
+    window = {
+      -- completion = cmp.config.window.bordered(),
+      -- documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+--======= indent-blankline =================
+require("ibl").setup {
+	indent = {
+		char = "│",
+		tab_char = "│",
+	},
+	scope = { enabled = false },
+	exclude = {
+		filetypes = {
+			"help",
+			"alpha",
+			"dashboard",
+			"startify",
+			"neo-tree",
+			"NvimTree",
+			"Trouble",
+			"trouble",
+			"lazy",
+			"mason",
+			"notify",
+			"toggleterm",
+			"lazyterm",
+		},
+	},
+}
+--======= mini.indentscopei =================
+require('mini.indentscope').setup{
+  -- symbol = "▏",
+  symbol = "│",
+  options = { try_as_border = true },
+
+}
+
+-- ====== telescope-fzf-native ===================
+-- You dont need to set any of these options. These are the default ones. Only
+-- the loading is important
+require('telescope').setup {
+  extensions = {
+    fzf = {
+      fuzzy = true,                    -- false will only do exact matching
+      override_generic_sorter = true,  -- override the generic sorter
+      override_file_sorter = true,     -- override the file sorter
+      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                                       -- the default case_mode is "smart_case"
+    }
+  }
+}
+-- To get fzf loaded and working with telescope, you need to call
+-- load_extension, somewhere after setup function:
+require('telescope').load_extension('fzf')
+
+------------------------EOF------------------------------------------
 EOF
 
-" Code snippets
-"let g:completion_enable_snippet = 'UltiSnips'
+"======Plug 'nagy135/typebreak.nvim'
+nnoremap <leader>tb :lua require("typebreak").start()<CR>
+
 
 " Fuzzy finder telescope
 
@@ -686,7 +819,7 @@ nnoremap <leader>fd <cmd>Telescope lsp_definitions<cr>
 ""
 "
 "=======Plug airblade/vim-roooter'================================
-let g:rooter_patterns = ['.repo', 'cscope.out', '.thisRoot', '.gitignore']
+let g:rooter_patterns = ['.repo','.gitignore', '.thisRoot' ]
 "let g:rooter_patterns = ['.thisroot','.git','.git/', '.vbproj', '.mxproject', '.svn']
 
 "====== For FZF ==================================================
@@ -699,8 +832,13 @@ let g:fzf_preview_window = ['down:hidden', 'ctrl-/']
 ""-------- file type "syntax---------------------------------------------------------------------------
 au BufRead,BufNewFile *.xaml setfiletype xml
 au BufRead,BufNewFile *.hta setfiletype Javascript
+au BufRead,BufNewFile *.pyw setfiletype python
 
 "========= rainbow Plugin Setting =========================================
 "au FileType c,cpp,objc,objcpp,python,Javascript,html,txt,hta,js call rainbow#load()
 let g:rainbow_active = 1
+
+
+" ordinary Neovim
+endif 
 

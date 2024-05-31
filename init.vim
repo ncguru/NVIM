@@ -223,8 +223,9 @@ endfunction
 "==== PlugIn manager==========================================
 call plug#begin('~/AppData/Local/nvim/plugged')
 " Typing Game
-Plug 'nagy135/typebreak.nvim'
-
+Plug 'NStefan002/speedtyper.nvim'
+Plug 'stevearc/dressing.nvim'
+Plug 'rcarriga/nvim-notify'
 " AI gemini
 "Plug 'kiddos/gemini.nvim'
 
@@ -251,9 +252,9 @@ Plug 'vim-airline/vim-airline'
 "Plug 'vim-airline/vim-airline-themes'
 
 " gruvbox colorscheme. Seems to work the best for me.
-" Plug 'rafamadriz/gruvbox'
 Plug 'ellisonleao/gruvbox.nvim'
 Plug 'folke/tokyonight.nvim'
+Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 
 "taglist
 Plug 'yegappan/taglist'
@@ -277,16 +278,11 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'WhoIsSethDaniel/toggle-lsp-diagnostics.nvim' "Toggle ALL diagnostics on/off
 
 " ==== Auto Complete
-Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
-
-" For vsnip users.
-Plug 'hrsh7th/cmp-vsnip'
-Plug 'hrsh7th/vim-vsnip'
 
 
 "==== IME 입력 모드에서 명령모드 변경시 IME 영문으로 자동 변경============
@@ -321,7 +317,7 @@ Plug 'tpope/vim-fugitive'
 
 " Auto Rooter directory
 Plug 'airblade/vim-rooter'
-
+"Plug 'notjedi/nvim-rooter.lua'
 "oldfiles
 "Plug 'gpanders/vim-oldfiles'
 
@@ -370,20 +366,6 @@ call wilder#set_option('pipeline', [
 :command EX NvimTreeFindFileToggle
 
 " }
-
-" UI Options {
-
-" Colorsheme gruvbox   --------------------------------------------------
-let g:gruvbox_italic_comment = 0 
-
-let g:gruvbox_italic = 0
-
-let g:gruvbox_contrast_dark = 'hard'
-let g:gruvbox_bold = 0
-let g:gruvbox_improved_strings=0
-" Colorscheme options.
-"set bg=dark
-colorscheme gruvbox
 
 " Keybindings {
 "
@@ -515,7 +497,7 @@ if executable('pylsp')
         \ 'name': 'pylsp',
         \ 'cmd': {server_info->['pylsp']},
         \ 'allowlist': ['python'],
-        \ })
+       \ })
 endif
 
 
@@ -534,7 +516,7 @@ if executable("deno")
     autocmd User lsp_setup call lsp#register_server({
     \ "name": "deno lsp",
     \ "cmd": {server_info -> ["deno", "lsp"]},
-    \ "root_uri": {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), "tsconfig.json"))},
+    \ "root_uri": {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), "tsconfig.json", ".gitignore"))},
     \ "allowlist": ["typescript", "typescript.tsx"],
     \ "initialization_options": {
     \     "enable": v:true,
@@ -630,7 +612,8 @@ vim.opt.termguicolors = true
 -- empty setup using defaults
 require("nvim-tree").setup()
 
-
+require("speedtyper").setup({
+        })
 ----LSP-----------------------------------------------
 require("mason").setup()
 require("mason-lspconfig").setup()
@@ -640,13 +623,28 @@ require'toggle_lsp_diagnostics'.init({start_on = false})
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 require('lspconfig')['pylsp'].setup {
-	capabilities = capabilities
+	capabilities = capabilities,
 }
+
 require('lspconfig')['clangd'].setup {
-	capabilities = capabilities
+	capabilities = capabilities,
 }
+
 require('lspconfig')['denols' ].setup {
-	capabilities = capabilities
+	capabilities = capabilities,
+}
+
+local nvim_lsp = require'lspconfig'
+nvim_lsp.pylsp.setup{
+  root_dir = nvim_lsp.util.root_pattern('.gitignore');
+}
+local nvim_lsp = require'lspconfig'
+nvim_lsp.clangd.setup{
+  root_dir = nvim_lsp.util.root_pattern('.gitignore');
+}
+local nvim_lsp = require'lspconfig'
+nvim_lsp.denols.setup{
+  root_dir = nvim_lsp.util.root_pattern('.gitignore');
 }
 ----nvim-treesitter-----------------------------------------------
 require'nvim-treesitter.install'.compilers = { "gcc" }
@@ -662,7 +660,7 @@ require'nvim-treesitter.configs'.setup {
 	auto_install = false,
 	-- Enable Rainbow Parentheses
 	rainbow = {
-		enable = true,
+		enable = false,
 	}, 
 	-- Enable Treesitter Playground
 	playground = { enable = false},
@@ -714,8 +712,8 @@ require'nvim-treesitter.configs'.setup {
       end,
     },
     window = {
-      -- completion = cmp.config.window.bordered(),
-      -- documentation = cmp.config.window.bordered(),
+       completion = cmp.config.window.bordered(),
+       documentation = cmp.config.window.bordered(),
     },
     mapping = cmp.mapping.preset.insert({
       ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -786,8 +784,56 @@ require('telescope').setup {
 -- load_extension, somewhere after setup function:
 require('telescope').load_extension('fzf')
 
+require('mini.pairs').setup()
+
+-- Default options:
+require("gruvbox").setup({
+  terminal_colors = true, -- add neovim terminal colors
+  undercurl = true,
+  underline = true,
+  bold = true,
+  italic = {
+    strings = false,
+    emphasis = true,
+    comments = false,
+    operators = false,
+    folds = true,
+  },
+  strikethrough = true,
+  invert_selection = false,
+  invert_signs = false,
+  invert_tabline = false,
+  invert_intend_guides = false,
+  inverse = true, -- invert background for search, diffs, statuslines and errors
+  contrast = "", -- can be "hard", "soft" or empty string
+  palette_overrides = {},
+  overrides = {
+	  ["String"] = {fg = "#A9D08E"},
+	  --["String"] = {fg = "#FFC000"},
+  },
+  dim_inactive = false,
+  transparent_mode = true,
+})
+vim.cmd("colorscheme gruvbox")
+
+
 ------------------------EOF------------------------------------------
 EOF
+
+" UI Options {
+o
+" Colorsheme gruvbox   --------------------------------------------------
+"let g:gruvbox_italic_comment = 0 
+"
+"let g:gruvbox_italic = 0
+"
+"let g:gruvbox_contrast_dark = 'hard'
+"let g:gruvbox_bold = 0
+"let g:gruvbox_improved_strings=0
+"colorscheme gruvbox
+"
+
+
 
 "======Plug 'nagy135/typebreak.nvim'
 nnoremap <leader>tb :lua require("typebreak").start()<CR>
@@ -824,14 +870,15 @@ let g:rooter_patterns = ['.repo','.gitignore', '.thisRoot' ]
 
 "====== For FZF ==================================================
 let $PATH = "C:\\Program Files\\Git\\bin;" . $PATH
-let g:fzf_layout = { 'down': '~80%' }
+"let g:fzf_layout = { 'down': '50%' }
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6 } }
 "let g:fzf_preview_window = [] " disable
-let g:fzf_preview_window = ['down:hidden', 'ctrl-/']
+"let g:fzf_preview_window = ['down:hidden', 'ctrl-/']
 
 
 ""-------- file type "syntax---------------------------------------------------------------------------
 au BufRead,BufNewFile *.xaml setfiletype xml
-au BufRead,BufNewFile *.hta setfiletype Javascript
+au BufRead,BufNewFile *.hta setfiletype html
 au BufRead,BufNewFile *.pyw setfiletype python
 
 "========= rainbow Plugin Setting =========================================

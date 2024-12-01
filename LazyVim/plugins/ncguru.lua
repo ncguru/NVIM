@@ -5,9 +5,13 @@
 -- * disable/enabled LazyVim plugins
 -- * override the configuration of LazyVim plugins
 return {
-  -- add gruvbox
-  {
-    "ellisonleao/gruvbox.nvim",
+  -- add catppuccin
+    { "catppuccin/nvim" },
+    -- add monokai pro
+    {"loctvl842/monokai-pro.nvim"},
+    -- add gruvbox
+    {
+        "ellisonleao/gruvbox.nvim",
     opts = {
       terminal_colors = true, -- add neovim terminal colors
       undercurl = true,
@@ -33,7 +37,7 @@ return {
         --["String"] = {fg = "#FFC000"},
       },
       dim_inactive = false,
-      transparent_mode = true,
+      transparent_mode = false,
     },
   },
   -- add tokyonight
@@ -92,5 +96,17 @@ return {
   -- rainbow-delimiters
   {
     "HiPhish/rainbow-delimiters.nvim",
+  },
+  -- LSP
+  {
+    "neovim/nvim-lspconfig",
+    enabled = true,
+  },
+  -- notify
+  {
+    "rcarriga/nvim-notify",
+    opts = {
+      timeout = 6000,
+    },
   },
 }
